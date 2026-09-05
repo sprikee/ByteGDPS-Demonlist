@@ -1,0 +1,53 @@
+{
+    "geode": "5.10.1",
+    "gd": {
+        "android": "2.2081",
+        "win": "2.2081",
+        "mac": "2.2081",
+        "ios": "2.2081"
+    },
+    "version": "v1.0.0",
+    "id": "bytegdps.demonlist",
+    "name": "ByteGDPS Demonlist",
+    "developer": "sprike",
+    "description": "ByteGDPS Demonlist — топ демонов с bytegdps.ru прямо в игре.",
+    "resources": {
+        "files": [
+            "resources/*.frag",
+            "resources/*.vert"
+        ],
+        "sprites": [
+            "resources/*.png"
+        ]
+    },
+    "settings": {
+        "enable-rank": {
+            "name": "Enable Demon Ranking Text",
+            "description": "Whether or not to display the demon ranking text.",
+            "type": "bool",
+            "default": true
+        },
+        "white-rank": {
+            "name": "White Demon Ranking Text",
+            "description": "Whether or not to display the demon ranking text in white.",
+            "type": "bool",
+            "enable-if": "enable-rank",
+            "default": false
+        }
+    },
+    "dependencies": {
+        "geode.node-ids": ">=v1.9.0"
+    },
+    "links": {
+        "community": "https://t.me/ByteGDPS",
+        "homepage": "https://bytegdps.ru",
+        "source": "https://github.com/hiimjasmine00/IntegratedDemonlist"
+    },
+    "tags": [
+        "content",
+        "enhancement",
+        "interface",
+        "online",
+        "utility"
+    ]
+}
