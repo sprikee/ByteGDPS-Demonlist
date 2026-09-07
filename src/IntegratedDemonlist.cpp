@@ -1,3 +1,4 @@
+#include "utils/ByteGDPS.hpp"
 #include "IntegratedDemonlist.hpp"
 #include <jasmine/web.hpp>
 
@@ -10,6 +11,7 @@ bool IntegratedDemonlist::aredlLoaded = false;
 bool IntegratedDemonlist::pemonlistLoaded = false;
 
 void IntegratedDemonlist::loadAREDL(TaskHolder<web::WebResponse>& listener, Function<void()> success, CopyableFunction<void(int)> failure) {
+    if (!ByteGDPS::isActive()) return failure(-1);
     listener.spawn(
         web::WebRequest().get("https://bytegdps.ru/api/demonlist.php"),
         [failure = std::move(failure), success = std::move(success)](web::WebResponse res) mutable {
@@ -44,6 +46,7 @@ void IntegratedDemonlist::loadAREDL(TaskHolder<web::WebResponse>& listener, Func
 }
 
 void IntegratedDemonlist::loadAREDLPacks(TaskHolder<web::WebResponse>& listener, Function<void()> success, CopyableFunction<void(int)> failure) {
+    if (!ByteGDPS::isActive()) return failure(-1);
     listener.spawn(
         web::WebRequest().get("https://api.aredl.net/v2/api/aredl/pack-tiers"),
         [failure = std::move(failure), success = std::move(success)](web::WebResponse res) mutable {
