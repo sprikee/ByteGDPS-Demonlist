@@ -1,5 +1,6 @@
 #include "../classes/IDListLayer.hpp"
 #include <Geode/modify/LevelSearchLayer.hpp>
+#include "../utils/ByteGDPS.hpp"
 #include <Geode/ui/BasedButtonSprite.hpp>
 
 using namespace geode::prelude;
@@ -7,6 +8,7 @@ using namespace geode::prelude;
 class $modify(IDLevelSearchLayer, LevelSearchLayer) {
     bool init(int searchType) {
         if (!LevelSearchLayer::init(searchType)) return false;
+        if (!ByteGDPS::isActive()) return true;
 
         auto demonlistButtonSprite = CircleButtonSprite::createWithSprite("ID_demonBtn_001.png"_spr);
         demonlistButtonSprite->getTopNode()->setScale(1.0f);

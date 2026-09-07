@@ -1,4 +1,5 @@
 #include "../IntegratedDemonlist.hpp"
+#include "../utils/ByteGDPS.hpp"
 #include <Geode/binding/GJGameLevel.hpp>
 #include <Geode/modify/LevelCell.hpp>
 #include <Geode/utils/StringBuffer.hpp>
@@ -21,6 +22,7 @@ class $modify(IDLevelCell, LevelCell) {
 
     void loadFromLevel(GJGameLevel* level) {
         LevelCell::loadFromLevel(level);
+        if (!ByteGDPS::isActive()) return;
 
         auto platformer = level->isPlatformer();
         auto difficulty = level->m_demonDifficulty;
@@ -29,8 +31,17 @@ class $modify(IDLevelCell, LevelCell) {
 
         auto levelID = level->m_levelID.value();
         std::vector<int> positions;
-        for (auto& demon : platformer ? IntegratedDemonlist::pemonlist : IntegratedDemonlist::aredl) {
+        for (auto& demon : IntegratedDemonlist::aredl) {
             if (demon.id == levelID) positions.push_back(demon.position);
+        }
+        if (positions.empty()) {
+            auto lowerName = string::toLower(std::string(level->m_levelName));
+            for (auto& demon : IntegratedDemonlist::aredl) {
+                if (string::toLower(demon.name) == lowerName) {
+                    positions.push_back(demon.position);
+                    break;
+                }
+            }
         }
         if (!positions.empty()) return addRank(positions);
 
@@ -38,10 +49,8 @@ class $modify(IDLevelCell, LevelCell) {
         loadedDemons.insert(levelID);
 
         m_fields->m_listener.spawn(
-            web::WebRequest().get(platformer
-                ? fmt::format("https://pemonlist.com/api/level/{}?version=2", levelID)
-                : fmt::format("https://api.aredl.net/v2/api/aredl/levels/{}", levelID)),
-            [this, levelID, levelName = std::string(level->m_levelName), platformer, twoPlayer = level->m_twoPlayerMode](
+            web::WebRequest().get(fmt::format("https://bytegdps.ru/api/demonlist.php?level_id={}", levelID)),
+            [this, levelID, levelName = std::string(level->m_levelName)](
                 web::WebResponse res
             ) mutable {
                 if (!res.ok()) return;
@@ -49,42 +58,15 @@ class $modify(IDLevelCell, LevelCell) {
                 auto json = res.json();
                 if (!json.isOk()) return;
 
-                auto position = json.unwrap().get<int>(platformer ? "placement" : "position");
+                auto position = json.unwrap().get<int>("position");
                 if (!position.isOk()) return;
 
-                auto position1 = position.unwrap();
-                if (platformer && position1 > 150) return;
-
-                IDListDemon demon(levelID, position1, levelName);
-                auto& list = platformer ? IntegratedDemonlist::pemonlist : IntegratedDemonlist::aredl;
-                if (!std::ranges::contains(list, demon)) {
-                    list.push_back(std::move(demon));
+                IDListDemon demon(levelID, position.unwrap(), levelName);
+                if (!std::ranges::contains(IntegratedDemonlist::aredl, demon)) {
+                    IntegratedDemonlist::aredl.push_back(std::move(demon));
                 }
 
-                std::vector<int> positions = { position1 };
-                if (platformer || !twoPlayer) return addRank(positions);
-
-                m_fields->m_listener.spawn(
-                    web::WebRequest().get(fmt::format("https://api.aredl.net/v2/api/aredl/levels/{}_2p", levelID)),
-                    [this, levelID, levelName, positions](web::WebResponse res) mutable {
-                        if (!res.ok()) return addRank(positions);
-
-                        auto json = res.json();
-                        if (!json.isOk()) return addRank(positions);
-
-                        auto position = json.unwrap().get<int>("position");
-                        if (!position.isOk()) return addRank(positions);
-
-                        auto position2 = position.unwrap();
-                        IDListDemon demon(levelID, position2, levelName);
-                        if (!std::ranges::contains(IntegratedDemonlist::aredl, demon)) {
-                            IntegratedDemonlist::aredl.push_back(std::move(demon));
-                        }
-
-                        positions.push_back(position2);
-                        addRank(positions);
-                    }
-                );
+                addRank({ position.unwrap() });
             }
         );
     }
@@ -95,13 +77,12 @@ class $modify(IDLevelCell, LevelCell) {
         auto dailyLevel = m_level->m_dailyID.value() > 0;
         auto isWhite = dailyLevel || jasmine::setting::getValue<bool>("white-rank");
 
-        StringBuffer positionsStr;
+        StringBuffer<> positionsStr;
         for (auto it = positions.begin(); it != positions.end(); ++it) {
             if (it != positions.begin()) positionsStr.append('/');
             positionsStr.append("#{}", *it);
         }
-        if (m_level->isPlatformer()) positionsStr.append(" Pemonlist");
-        else positionsStr.append(" AREDL");
+        positionsStr.append(" ByteGDPS");
 
         auto rankTextNode = CCLabelBMFont::create(positionsStr.c_str(), "chatFont.fnt");
         rankTextNode->setPosition({ 346.0f, dailyLevel ? 6.0f : 1.0f });

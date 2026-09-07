@@ -1,16 +1,16 @@
 {
-    "geode": "5.0.0-beta.1",
+    "geode": "5.10.1",
     "gd": {
         "android": "2.2081",
         "win": "2.2081",
         "mac": "2.2081",
         "ios": "2.2081"
     },
-    "version": "v1.7.13",
-    "id": "hiimjustin000.integrated_demonlist",
-    "name": "Integrated Demonlist",
-    "developer": "hiimjasmine00",
-    "description": "Simple AREDL and Pemonlist integration.",
+    "version": "v1.0.0",
+    "id": "bytegdps.demonlist",
+    "name": "ByteGDPS Demonlist",
+    "developer": "sprike",
+    "description": "ByteGDPS Demonlist — топ демонов с bytegdps.ru прямо в игре.",
     "resources": {
         "files": [
             "resources/*.frag",
@@ -33,15 +33,21 @@
             "type": "bool",
             "enable-if": "enable-rank",
             "default": false
+        },
+        "bytegdps-only": {
+            "name": "Only On ByteGDPS",
+            "description": "Automatically disable this mod when connected to vanilla or any other server.",
+            "type": "bool",
+            "default": true
         }
     },
     "dependencies": {
         "geode.node-ids": ">=v1.9.0"
     },
     "links": {
-        "community": "https://discord.gg/QVKmbvBXA7",
-        "source": "https://github.com/hiimjasmine00/IntegratedDemonlist",
-        "homepage": "https://www.hiimjasmine00.com"
+        "community": "https://t.me/ByteGDPS",
+        "homepage": "https://bytegdps.ru",
+        "source": "https://github.com/hiimjasmine00/IntegratedDemonlist"
     },
     "tags": [
         "content",

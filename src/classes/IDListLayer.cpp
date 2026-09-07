@@ -32,9 +32,8 @@ CCScene* IDListLayer::scene() {
 
 bool pemonlistEnabled = false;
 constexpr std::string_view aredlInfo =
-    "The <cg>All Rated Extreme Demons List</c> (<cg>AREDL</c>) is an <cp>unofficial ranking</c> "
-    "of all rated <cj>classic mode</c> <cr>extreme demons</c> in Geometry Dash.\n"
-    "It is managed by <cy>C6Carbon</c> and <cy>Padahk</c>.";
+    "The <cg>ByteGDPS Demonlist</c> is the demon ranking from <cy>bytegdps.ru</c>.\n"
+    "It shows the position (<cp>#N</c>) of each listed <cr>demon</c> right in the game.";
 constexpr std::string_view pemonlistInfo =
     "The <cg>Pemonlist</c> is an <cp>unofficial ranking</c> of the top 150 <cj>platformer mode</c> <cr>demons</c> in Geometry Dash.\n"
     "It is managed by <cy>camila314</c>, <cy>Extatica</c>, <cy>IvanCrafter026</c>, <cy>Megu</c>, <cy>Voiddle</c>, "
@@ -75,7 +74,7 @@ bool IDListLayer::init() {
     m_countLabel->setID("level-count-label");
     addChild(m_countLabel);
 
-    m_list = GJListLayer::create(nullptr, pemonlistEnabled ? "Pemonlist" : "All Rated Extreme Demons List", { 0, 0, 0, 180 }, 356.0f, 220.0f, 0);
+    m_list = GJListLayer::create(nullptr, "ByteGDPS Demonlist", { 0, 0, 0, 180 }, 356.0f, 220.0f, 0);
     m_list->setPosition(winSize / 2.0f - m_list->getContentSize() / 2.0f);
     m_list->setID("GJListLayer");
     addChild(m_list, 2);
@@ -134,14 +133,14 @@ bool IDListLayer::init() {
     m_rightButton->setID("next-page-button");
     menu->addChild(m_rightButton);
 
-    m_infoButton = InfoAlertButton::create(pemonlistEnabled ? "Pemonlist" : "All Rated Extreme Demons List",
-        pemonlistEnabled ? gd::string(pemonlistInfo.data(), pemonlistInfo.size()) : gd::string(aredlInfo.data(), aredlInfo.size()), 1.0f);
+    m_infoButton = InfoAlertButton::create("ByteGDPS Demonlist",
+        gd::string(aredlInfo.data(), aredlInfo.size()), 1.0f);
     m_infoButton->setPosition({ 30.0f, 30.0f });
     m_infoButton->setID("info-button");
     menu->addChild(m_infoButton, 2);
 
     m_aredlFailure = [this](int code) {
-        FLAlertLayer::create(fmt::format("Load Failed ({})", code).c_str(), "Failed to load AREDL. Please try again later.", "OK")->show();
+        FLAlertLayer::create(fmt::format("Load Failed ({})", code).c_str(), "Failed to load ByteGDPS Demonlist. Please try again later.", "OK")->show();
         m_loadingCircle->setVisible(false);
     };
 
@@ -171,6 +170,7 @@ bool IDListLayer::init() {
     m_moonToggle->setColor(pemonlistEnabled ? ccColor3B { 255, 255, 255 } : ccColor3B { 125, 125, 125 });
     m_moonToggle->setID("pemonlist-button");
     menu->addChild(m_moonToggle, 2);
+    m_moonToggle->setVisible(false);
 
     auto pageBtnSpr = CCSprite::create("GJ_button_02.png");
     pageBtnSpr->setScale(0.7f);
@@ -281,10 +281,10 @@ void IDListLayer::onStar(CCObject* sender) {
     m_moonToggle->setColor({ 125, 125, 125 });
     showLoading();
     if (auto listTitle = static_cast<CCLabelBMFont*>(m_list->getChildByID("title"))) {
-        listTitle->setString("All Rated Extreme Demons List");
+        listTitle->setString("ByteGDPS Demonlist");
         listTitle->limitLabelWidth(280.0f, 0.8f, 0.0f);
     }
-    m_infoButton->m_title = "All Rated Extreme Demons List";
+    m_infoButton->m_title = "ByteGDPS Demonlist";
     m_infoButton->m_description = gd::string(aredlInfo.data(), aredlInfo.size());
     m_fullSearchResults.clear();
     if (IntegratedDemonlist::aredlLoaded) {

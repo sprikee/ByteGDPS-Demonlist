@@ -11,7 +11,7 @@ bool IntegratedDemonlist::pemonlistLoaded = false;
 
 void IntegratedDemonlist::loadAREDL(TaskHolder<web::WebResponse>& listener, Function<void()> success, CopyableFunction<void(int)> failure) {
     listener.spawn(
-        web::WebRequest().get("https://api.aredl.net/v2/api/aredl/levels"),
+        web::WebRequest().get("https://bytegdps.ru/api/demonlist.php"),
         [failure = std::move(failure), success = std::move(success)](web::WebResponse res) mutable {
             if (!res.ok()) return failure(res.code());
 
